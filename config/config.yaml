@@ -1,0 +1,71 @@
+# Exp config
+experiment:
+  name: mnist-manifold-geometry
+  seed: 42
+  device: cuda
+  deterministic : true
+
+# Data
+data:
+  dataset : MNIST
+  root: ./data
+  input_dim : 784
+  num_classes : 10
+  subset_size : 10000
+  shuffle : true
+  num_workers: 1
+
+# Model:
+model:
+  type: mlp
+  input_dim: 784
+  hidden_dim : [512, 256, 128]
+  output_dim : 10
+  use_layer_norm: false
+
+# Optim
+optim:
+  optimizer: adam
+  lr : 0.001
+  weight_decay: 0.0
+
+training:
+  batch_size: 32
+  max_steps: 50000
+  log_every : 500
+  checkpoint_steps : [1000, 10000, 50000]
+
+# Objective specific settings
+Objective:
+  type: supervised
+
+  supervised:
+    loss: cross_entropy
+
+  autoencoder:
+    loss: mse
+
+  contrasive:
+    temperature: 0.5
+    projection_dim: 64
+    augmentations:
+      gaussian_noise_std: 0.1
+      random_crop: true
+
+  
+  random_labels:
+    num_classes: 10
+
+# Representation extraction:
+representation:
+  save_layers : all
+  save_logits : true
+  output_dim  : ./representation
+
+# Analysis
+  knn_k: 10
+  pca_components: null
+  perturbation_std: 0.05
+
+
+
