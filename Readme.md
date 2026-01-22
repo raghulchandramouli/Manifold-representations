@@ -358,8 +358,8 @@ If you use this code in your research, please cite:
 ```bibtex
 @misc{manifold-representations,
   title={Manifold Representations: Analyzing Geometric Properties of Learned Representations},
-  author={Your Name},
-  year={2024}
+  author={Raghul-chandramouli},
+  year={2026}
 }
 ```
 
