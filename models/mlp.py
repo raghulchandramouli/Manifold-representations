@@ -49,7 +49,7 @@ class MLP(nn.Module):
         self,
         x: torch.Tensor,
         return_activations: bool = False,
-    ) -> Tuple[torch.Tensor. List[torch.Tensor]]:
+    ) -> Tuple[torch.Tensor, List[torch.Tensor]]:
         """
         Forward pass through the network.
 
@@ -102,7 +102,7 @@ class EncoderOnlyMLP(nn.Module):
         self.backbone  = MLP(
             input_dim  = input_dim,
             hidden_dim = hidden_dim,
-            output_dim = output_dim[-1],
+            output_dim = hidden_dim[-1],
             use_layer_norm = use_layer_norm,
         )
 

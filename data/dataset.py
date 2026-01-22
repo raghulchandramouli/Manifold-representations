@@ -34,18 +34,19 @@ class MNISTDataset(Dataset):
         subset_size: Optional[int] = None,
         seed : int = 42,
         contrasive_aug : Optional[ContrasiveAugmentation] = None,
+        contrastive_aug: Optional[ContrasiveAugmentation] = None,
         
     ):
         assert objective in {
             "supervised",
             "random_labels",
-            "contrasive",
-            "random_labels",
+            "autoencoder",
+            "contrastive",
         }
-        
+
         self.objective = objective
         self.seed = seed
-        
+
         self.base_transform = transforms.ToTensor()
         
         self.dataset = datasets.MNIST(
@@ -73,8 +74,8 @@ class MNISTDataset(Dataset):
         else:
             self.random_labels = None
             
-        # Contrastive augmentation
-        self.contrasive_aug = contrasive_aug
+        # Contrastive augmentation (accept both spellings for backward compatibility)
+        self.contrastive_aug = contrastive_aug if contrastive_aug is not None else contrasive_aug
         
     def __len__(self):
         return len(self.dataset)
@@ -91,9 +92,9 @@ class MNISTDataset(Dataset):
         if self.objective == "autoencoder":
             return x, x
         
-        if self.objective == 'contrasive':
-            assert self.contrasive_aug is not None
-            x1, x2 = self.contrasive_aug(x)
+        if self.objective == 'contrastive':
+            assert self.contrastive_aug is not None
+            x1, x2 = self.contrastive_aug(x)
             return x1, x2
         
         raise RuntimeError("Invalid objective")

@@ -37,10 +37,13 @@ class BaseTrainer(ABC):
         
         self.device = self._resolve_device(cfg['experiment']['device'])
         self.model.to(self.device)
-        
-        self.max_steps = cfg['experiment']['max_steps']
-        self.log_every = cfg['experiment']['log_every']
-        self.checkpoint_steps = set(cfg['training']['checkpoint_steps'])
+        # Prefer training-level settings, fall back to experiment-level for backwards compatibility
+        training_cfg = cfg.get('training', {})
+        experiment_cfg = cfg.get('experiment', {})
+
+        self.max_steps = training_cfg.get('max_steps', experiment_cfg.get('max_steps', 10000))
+        self.log_every = training_cfg.get('log_every', experiment_cfg.get('log_every', 100))
+        self.checkpoint_steps = set(training_cfg.get('checkpoint_steps', []))
         
         self.global_step = 0
         
@@ -100,8 +103,17 @@ class BaseTrainer(ABC):
         return batch.to(self.device)
     
     def _resolve_device(self, device):
-        if device_cfg == 'cuda' and torch.cuda.is_available():
-            return torch.device('cuda')
+        # Support 'cuda', 'cpu', and 'auto' options. Fallback to CPU if CUDA not available.
+        if device == 'auto':
+            return torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+        if device == 'cuda':
+            if torch.cuda.is_available():
+                return torch.device('cuda')
+            print("CUDA requested but not available; falling back to CPU")
+            return torch.device('cpu')
+
+        # Default to CPU for 'cpu' or any other unspecified value
         return torch.device('cpu')
     
     def _log(self, metrics: Dict[str, float]):

@@ -8,8 +8,12 @@ class ContrastiveTrainer(BaseTrainer):
     SimCLR-style contrastive trainer using NT-Xent loss.
     """
 
-    def __init__(self, *args, temperature: float = 0.5, **kwargs):
+    def __init__(self, *args, projection_head=None, temperature: float = 0.5, **kwargs):
         super().__init__(*args, **kwargs)
+        # projection_head is optional; move it to device if provided
+        self.projection_head = projection_head
+        if self.projection_head is not None:
+            self.projection_head.to(self.device)
         self.temperature = temperature
 
     def training_step(self, batch):
@@ -19,6 +23,11 @@ class ContrastiveTrainer(BaseTrainer):
 
         z1 = self.model(x1)
         z2 = self.model(x2)
+
+        # Optionally apply projection head before computing contrastive loss
+        if self.projection_head is not None:
+            z1 = self.projection_head(z1)
+            z2 = self.projection_head(z2)
 
         loss = self.nt_xent_loss(z1, z2)
 

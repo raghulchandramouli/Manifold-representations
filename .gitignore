@@ -1,0 +1,15 @@
+# Checkpoints
+.checkpoints/
+checkpoints/
+checkpoint/
+*.checkpoint
+checkpoint_*
+model_checkpoint_*
+*.ckpt
+*.pth.tar
+
+# Analysis results
+analysis/results/
+
+# Data
+data/MNIST/
